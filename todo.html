@@ -11,6 +11,7 @@
         <div>
             <input id="input-text" />
             <button id="add-button">할 일 추가</button>
+            <button id="logging-state">State Logging</button>
         </div>
 
         <script>
@@ -23,8 +24,22 @@
                 }
             }
 
+            function loggerMiddleware({ getState }) {
+                return (next) => (action) => {
+                    console.log("dispatch 예정 action", action);
+
+                    const returnValue = next(action);
+
+                    console.log("dispatch 이후 state", getState());
+
+                    return returnValue;
+                };
+            }
+
             var store = Redux.createStore(
-                todoReducer, ["처음 만난 리덕스 공부하기"]
+                todoReducer, 
+                ["처음 만난 리덕스 공부하기"],
+                Redux.applyMiddleware(loggerMiddleware)
             );
 
             var todoListElem = document.getElementById("todo-list");
@@ -51,6 +66,11 @@
                         });
 
                         inputElem.value = "";
+                    });
+
+            document.getElementById("logging-state")
+                    .addEventListener("click", function () {
+                        console.log("현재 state", store.getState());
                     });
         </script>
     </body>
